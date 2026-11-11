@@ -1,4 +1,3 @@
-
 using System.Collections;
 using UnityEngine;
 
@@ -14,9 +13,13 @@ public class SpellBolt : MonoBehaviour
     public float hitStopDuration = 0.08f;
     public int damage = 1;
 
+    [Header("Sound Effects")]
+    public AudioClip impactSound;
+    [Range(0f, 1f)]
+    public float impactVolume = 1f;
+
     private bool hasHit = false;
 
-    // Allows SpellCaster to assign the target
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
@@ -33,8 +36,8 @@ public class SpellBolt : MonoBehaviour
             return;
         }
 
-        // Move the bolt towards its target
-        Vector3 direction = (target.position - transform.position).normalized;
+        Vector3 direction =
+        (target.position - transform.position).normalized;
 
         transform.position = Vector3.MoveTowards(
         transform.position,
@@ -42,7 +45,6 @@ public class SpellBolt : MonoBehaviour
         speed * Time.deltaTime
         );
 
-        // Rotate the bolt towards its target
         if (direction != Vector3.zero)
         {
             transform.rotation = Quaternion.LookRotation(direction);
@@ -54,8 +56,8 @@ public class SpellBolt : MonoBehaviour
         if (hasHit)
             return;
 
-        // Find the dummy, including on parent objects
-        DummyTarget dummy = other.GetComponentInParent<DummyTarget>();
+        DummyTarget dummy =
+        other.GetComponentInParent<DummyTarget>();
 
         if (dummy == null)
             return;
@@ -65,7 +67,17 @@ public class SpellBolt : MonoBehaviour
         // Deal damage
         dummy.TakeDamage(damage);
 
-        // Spawn the impact particle effect
+        // Play impact sound
+        if (impactSound != null)
+        {
+            AudioSource.PlayClipAtPoint(
+            impactSound,
+            transform.position,
+            impactVolume
+            );
+        }
+
+        // Spawn impact particle effect
         if (impactPrefab != null)
         {
             GameObject effect = Instantiate(
@@ -77,7 +89,7 @@ public class SpellBolt : MonoBehaviour
             Destroy(effect, impactEffectLifetime);
         }
 
-        // Start hit-stop and destroy the bolt
+        // Start hit-stop
         StartCoroutine(ImpactSequence());
     }
 
@@ -85,18 +97,15 @@ public class SpellBolt : MonoBehaviour
     {
         float previousTimeScale = Time.timeScale;
 
-        // Freeze the game briefly
         Time.timeScale = 0f;
 
-        // Wait using real time, not game time
         yield return new WaitForSecondsRealtime(hitStopDuration);
 
-        // Restore normal game speed
         Time.timeScale = previousTimeScale;
 
-        // Destroy the projectile
         Destroy(gameObject);
     }
 }
+
 
 

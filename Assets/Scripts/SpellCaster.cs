@@ -6,9 +6,12 @@ public class SpellCaster : MonoBehaviour
     [Header("Spell Settings")]
     public GameObject boltPrefab;
     public Transform castPoint;
-
-    [Header("Targeting")]
     public float targetingRange = 30f;
+
+    [Header("Sound Effects")]
+    public AudioClip castSound;
+    [Range(0f, 1f)]
+    public float castVolume = 1f;
 
     void Update()
     {
@@ -21,44 +24,62 @@ public class SpellCaster : MonoBehaviour
 
     void CastSpell()
     {
-        DummyTarget nearestDummy = null;
+        if (boltPrefab == null || castPoint == null)
+        {
+            Debug.LogWarning("SpellCaster: Missing Bolt Prefab or Cast Point!");
+            return;
+        }
 
+        DummyTarget nearestTarget = null;
         float nearestDistance = targetingRange;
 
-        DummyTarget[] dummies =
-        FindObjectsByType<DummyTarget>(
-        FindObjectsSortMode.None
-        );
+        DummyTarget[] targets =
+        FindObjectsByType<DummyTarget>(FindObjectsSortMode.None);
 
-        foreach (DummyTarget dummy in dummies)
+        foreach (DummyTarget target in targets)
         {
             float distance = Vector3.Distance(
             transform.position,
-            dummy.transform.position
+            target.transform.position
             );
 
             if (distance < nearestDistance)
             {
                 nearestDistance = distance;
-                nearestDummy = dummy;
+                nearestTarget = target;
             }
         }
 
-        if (nearestDummy == null)
+        if (nearestTarget == null)
         {
-            Debug.Log("No dummy in range!");
+            Debug.Log("No dummy within targeting range.");
             return;
         }
 
+        // Spawn the bolt
         GameObject bolt = Instantiate(
         boltPrefab,
         castPoint.position,
-        Quaternion.identity
+        castPoint.rotation
         );
 
-        SpellBolt spell =
-        bolt.GetComponent<SpellBolt>();
+        // Assign target
+        SpellBolt spellBolt = bolt.GetComponent<SpellBolt>();
 
-        spell.SetTarget(nearestDummy.transform);
+        if (spellBolt != null)
+        {
+            spellBolt.SetTarget(nearestTarget.transform);
+        }
+
+        // Play casting sound
+        if (castSound != null)
+        {
+            AudioSource.PlayClipAtPoint(
+            castSound,
+            castPoint.position,
+            castVolume
+            );
+        }
     }
 }
+

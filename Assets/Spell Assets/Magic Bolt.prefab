@@ -133,6 +133,8 @@ MonoBehaviour:
   impactEffectLifetime: 2
   hitStopDuration: 0.08
   damage: 25
+  impactSound: {fileID: 8300000, guid: 9234d6e38a133174fb2d1d4df1e831e2, type: 3}
+  impactVolume: 1
 --- !u!54 &-5728447837380940356
 Rigidbody:
   m_ObjectHideFlags: 0
