@@ -4,46 +4,70 @@ using UnityEngine.InputSystem;
 
 public class CapsuleMovement : MonoBehaviour
 {
-    [Header("Movement Settings")]
+    [Header("Movement")]
     public float moveSpeed = 5f;
+    public float rotationSpeed = 12f;
 
-    private Vector2 moveInput;
+    [Header("Camera")]
+    public Transform cameraTransform;
 
     void Update()
     {
-        // Read keyboard input
-        moveInput = Vector2.zero;
+        Vector2 input = Vector2.zero;
 
         if (Keyboard.current != null)
         {
             if (Keyboard.current.wKey.isPressed ||
             Keyboard.current.upArrowKey.isPressed)
-                moveInput.y += 1;
+                input.y += 1;
 
             if (Keyboard.current.sKey.isPressed ||
             Keyboard.current.downArrowKey.isPressed)
-                moveInput.y -= 1;
+                input.y -= 1;
 
             if (Keyboard.current.dKey.isPressed ||
             Keyboard.current.rightArrowKey.isPressed)
-                moveInput.x += 1;
+                input.x += 1;
 
             if (Keyboard.current.aKey.isPressed ||
             Keyboard.current.leftArrowKey.isPressed)
-                moveInput.x -= 1;
+                input.x -= 1;
         }
 
-        // Move the Capsule
-        Vector3 movement = new Vector3(
-        moveInput.x,
-        0f,
-        moveInput.y
-        ).normalized;
+        if (cameraTransform == null)
+            return;
 
-        transform.Translate(
-        movement * moveSpeed * Time.deltaTime,
-        Space.World
-        );
+        // Get camera directions
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+
+        forward.y = 0f;
+        right.y = 0f;
+
+        forward.Normalize();
+        right.Normalize();
+
+        // Calculate camera-relative movement
+        Vector3 movement =
+        (forward * input.y + right * input.x).normalized;
+
+        // Move player
+        transform.position +=
+        movement * moveSpeed * Time.deltaTime;
+
+        // Rotate player towards movement
+        if (movement.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation =
+            Quaternion.LookRotation(movement);
+
+            transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            rotationSpeed * Time.deltaTime
+            );
+        }
     }
 }
+
 

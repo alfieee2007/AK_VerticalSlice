@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -206,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0.52, y: 1.38, z: -4.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -256,6 +257,28 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c54200c1e3c06248abc1b10983968fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonCamera
+  target: {fileID: 1940085197}
+  distance: 3.8
+  height: 1.65
+  shoulderOffset: 0.65
+  sensitivity: 0.07
+  minPitch: -30
+  maxPitch: 65
+  smoothSpeed: 8
+  collisionRadius: 0.2
+  collisionPadding: 0.1
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -545,6 +568,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1940085197 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1953998333426459532, guid: 355ec1541b637704d930922dcadd3a38, type: 3}
+  m_PrefabInstance: {fileID: 1572528114021983354}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1572528114021983354
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -553,6 +581,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -808341782843840573, guid: 355ec1541b637704d930922dcadd3a38, type: 3}
+      propertyPath: cameraTransform
+      value: 
+      objectReference: {fileID: 330585546}
     - target: {fileID: 1953998333426459532, guid: 355ec1541b637704d930922dcadd3a38, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.35639
@@ -597,6 +629,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 9018846680369368292, guid: 355ec1541b637704d930922dcadd3a38, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -607,7 +643,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 330585546}
+  - {fileID: 1572528114021983354}
+  - {fileID: 657845468}
   - {fileID: 410087041}
   - {fileID: 832575519}
-  - {fileID: 657845468}
-  - {fileID: 1572528114021983354}
