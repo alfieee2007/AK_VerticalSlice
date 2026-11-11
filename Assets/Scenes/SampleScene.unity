@@ -586,7 +586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DummyTarget
   health: 100
-  damageColour: {r: 1, g: 0, b: 0, a: 1}
+  damageColour: {r: 1, g: 0, b: 0, a: 0.6313726}
   flashDuration: 0.15
 --- !u!1 &1555190572
 GameObject:
@@ -964,6 +964,8 @@ MonoBehaviour:
   boltPrefab: {fileID: 7033606292760728267, guid: 4afe4b9f3566cb54a987f42e7949de03, type: 3}
   castPoint: {fileID: 1555190573}
   targetingRange: 30
+  castSound: {fileID: 8300000, guid: 64dd4d8fb7f80c54b8db01d490852086, type: 3}
+  castVolume: 1
 --- !u!1001 &1572528114021983354
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1047,6 +1049,10 @@ PrefabInstance:
       propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1846985198591778421, guid: 26f43ea3d38a4fd4499cf17f857030e6, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8f430b7cc56e1d44bbc5e7060920f32e, type: 2}
     - target: {fileID: 7538670937355599367, guid: 26f43ea3d38a4fd4499cf17f857030e6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.13
