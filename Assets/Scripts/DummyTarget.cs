@@ -1,113 +1,231 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 public class DummyTarget : MonoBehaviour
 {
-    [Header("Health")]
-    public int health = 100;
+    [Header("Health Settings")]
+    public int maxHealth = 5;
 
-    [Header("Damage Flash")]
-    public Color damageColour = Color.red;
-    public float flashDuration = 0.5f;
+    private int currentHealth;
+    private bool isDead = false;
 
-    private Renderer[] dummyRenderers;
-    private MaterialPropertyBlock propertyBlock;
-    private Color[][] originalColours;
+    [Header("Damage Number Settings")]
+    public GameObject damageNumberPrefab;
+    public Vector3 damageNumberOffset = new Vector3(0f, 1.5f, 0f);
 
-    private Coroutine flashRoutine;
+    [Header("Respawn Settings")]
+    public float respawnDelay = 2f;
+
+    [Header("Hex Settings")]
+    public float hexDuration = 5f;
+    public float hexDamageMultiplier = 2f;
+
+    [Header("Hex Visual Effect")]
+    public GameObject hexEffectPrefab;
+
+    private bool isHexed = false;
+    private Coroutine hexCoroutine;
+    private GameObject activeHexEffect;
+
+    private Renderer[] renderers;
+    private Collider[] colliders;
+
+    private Vector3 startingPosition;
+    private Quaternion startingRotation;
 
     void Awake()
     {
-        dummyRenderers = GetComponentsInChildren<Renderer>();
+        startingPosition = transform.position;
+        startingRotation = transform.rotation;
 
-        propertyBlock = new MaterialPropertyBlock();
+        renderers = GetComponentsInChildren<Renderer>();
+        colliders = GetComponentsInChildren<Collider>();
 
-        originalColours = new Color[dummyRenderers.Length][];
-
-        for (int i = 0; i < dummyRenderers.Length; i++)
-        {
-            Material[] materials = dummyRenderers[i].sharedMaterials;
-
-            originalColours[i] = new Color[materials.Length];
-
-            for (int j = 0; j < materials.Length; j++)
-            {
-                if (materials[j].HasProperty("_BaseColor"))
-                {
-                    originalColours[i][j] =
-                    materials[j].GetColor("_BaseColor");
-                }
-                else
-                {
-                    originalColours[i][j] = Color.white;
-                }
-            }
-        }
+        currentHealth = maxHealth;
     }
 
+    // DAMAGE
     public void TakeDamage(int damage)
     {
-        health -= damage;
+        if (isDead)
+            return;
 
-        Debug.Log("Dummy hit! Health: " + health);
+        int actualDamage = damage;
 
-        if (flashRoutine != null)
+        if (isHexed)
         {
-            StopCoroutine(flashRoutine);
+            actualDamage = Mathf.CeilToInt(
+            damage * hexDamageMultiplier
+            );
         }
 
-        flashRoutine = StartCoroutine(FlashRed());
-    }
+        currentHealth -= actualDamage;
 
-    IEnumerator FlashRed()
-    {
-        // Flash bright red
-        SetDummyColour(damageColour);
+        SpawnDamageNumber(actualDamage);
 
-        // Keep red visible during impact freeze
-        yield return new WaitForSecondsRealtime(flashDuration);
+        Debug.Log("Dummy health: " + currentHealth);
 
-        // Restore original colour
-        RestoreOriginalColour();
-
-        flashRoutine = null;
-    }
-
-    void SetDummyColour(Color colour)
-    {
-        for (int i = 0; i < dummyRenderers.Length; i++)
+        if (currentHealth <= 0)
         {
-            Material[] materials = dummyRenderers[i].sharedMaterials;
-
-            for (int j = 0; j < materials.Length; j++)
-            {
-                dummyRenderers[i].GetPropertyBlock(propertyBlock, j);
-
-                propertyBlock.SetColor("_BaseColor", colour);
-
-                dummyRenderers[i].SetPropertyBlock(propertyBlock, j);
-            }
+            StartCoroutine(DieAndRespawn());
         }
     }
 
-    void RestoreOriginalColour()
+    // HEAL
+    public void Heal(int amount)
     {
-        for (int i = 0; i < dummyRenderers.Length; i++)
+        if (isDead)
+            return;
+
+        currentHealth += amount;
+
+        currentHealth = Mathf.Min(currentHealth, maxHealth);
+
+        Debug.Log("Dummy healed! Health: " + currentHealth);
+    }
+
+    // HEX
+    public void ApplyHex()
+    {
+        if (isDead)
+            return;
+
+        // Refresh the curse duration.
+        if (hexCoroutine != null)
         {
-            Material[] materials = dummyRenderers[i].sharedMaterials;
-
-            for (int j = 0; j < materials.Length; j++)
-            {
-                dummyRenderers[i].GetPropertyBlock(propertyBlock, j);
-
-                propertyBlock.SetColor(
-                "_BaseColor",
-                originalColours[i][j]
-                );
-
-                dummyRenderers[i].SetPropertyBlock(propertyBlock, j);
-            }
+            StopCoroutine(hexCoroutine);
         }
+
+        // Create the visual effect if it doesn't exist.
+        if (activeHexEffect == null && hexEffectPrefab != null)
+        {
+            activeHexEffect = Instantiate(
+            hexEffectPrefab,
+            transform
+            );
+
+            activeHexEffect.transform.localPosition =
+            new Vector3(0f, 1f, 0f);
+
+            activeHexEffect.transform.localRotation =
+            Quaternion.identity;
+        }
+
+        if (activeHexEffect != null)
+        {
+            activeHexEffect.SetActive(true);
+        }
+
+        hexCoroutine = StartCoroutine(HexEffect());
+    }
+
+    private IEnumerator HexEffect()
+    {
+        isHexed = true;
+
+        Debug.Log("Dummy has been HEXED!");
+
+        yield return new WaitForSeconds(hexDuration);
+
+        isHexed = false;
+        hexCoroutine = null;
+
+        if (activeHexEffect != null)
+        {
+            Destroy(activeHexEffect);
+            activeHexEffect = null;
+        }
+
+        Debug.Log("Hex has expired!");
+    }
+
+    // DAMAGE NUMBERS
+    private void SpawnDamageNumber(int amount)
+    {
+        if (damageNumberPrefab == null)
+            return;
+
+        Vector3 spawnPosition =
+        transform.position + damageNumberOffset;
+
+        GameObject number = Instantiate(
+        damageNumberPrefab,
+        spawnPosition,
+        Quaternion.identity
+        );
+
+        DamageNumber damageNumber =
+        number.GetComponent<DamageNumber>();
+
+        if (damageNumber != null)
+        {
+            damageNumber.SetDamage(amount);
+        }
+    }
+
+    // DEATH AND RESPAWN
+    private IEnumerator DieAndRespawn()
+    {
+        isDead = true;
+
+        // Remove Hex when the dummy dies.
+        if (hexCoroutine != null)
+        {
+            StopCoroutine(hexCoroutine);
+            hexCoroutine = null;
+        }
+
+        isHexed = false;
+
+        if (activeHexEffect != null)
+        {
+            Destroy(activeHexEffect);
+            activeHexEffect = null;
+        }
+
+        foreach (Renderer rend in renderers)
+        {
+            rend.enabled = false;
+        }
+
+        foreach (Collider col in colliders)
+        {
+            col.enabled = false;
+        }
+
+        Debug.Log("Dummy defeated!");
+
+        yield return new WaitForSecondsRealtime(respawnDelay);
+
+        transform.position = startingPosition;
+        transform.rotation = startingRotation;
+
+        currentHealth = maxHealth;
+
+        foreach (Renderer rend in renderers)
+        {
+            rend.enabled = true;
+        }
+
+        foreach (Collider col in colliders)
+        {
+            col.enabled = true;
+        }
+
+        isDead = false;
+
+        Debug.Log("Dummy respawned!");
+    }
+
+    // GETTERS
+    public int GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+
+    public bool IsHexed()
+    {
+        return isHexed;
     }
 }
 

@@ -585,9 +585,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b3db1e516f99724a9140b2109b9e6ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DummyTarget
-  health: 100
-  damageColour: {r: 1, g: 0, b: 0, a: 0.6313726}
-  flashDuration: 0.15
+  maxHealth: 200
+  damageNumberPrefab: {fileID: 8170919037194859342, guid: e98ce35bb4e9585458ec52abe6f04ad4, type: 3}
+  damageNumberOffset: {x: 0, y: 1.5, z: 0}
+  respawnDelay: 2
+  hexDuration: 5
+  hexDamageMultiplier: 2
+  hexEffectPrefab: {fileID: 6575111179589516773, guid: 0fd74cb102619c649a76698dd4249e32, type: 3}
 --- !u!1 &1555190572
 GameObject:
   m_ObjectHideFlags: 0
@@ -834,9 +838,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 70}
+  m_AnchoredPosition: {x: -875, y: 70}
   m_SizeDelta: {x: 350, y: 70}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: -2, y: 0.5}
 --- !u!114 &1637232263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -857,7 +861,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'PREES E - MAGIC BOLT
+  m_text: 'PRESS E - MAGIC BOLT
 
 '
   m_isRightToLeft: 0
@@ -966,6 +970,9 @@ MonoBehaviour:
   targetingRange: 30
   castSound: {fileID: 8300000, guid: 64dd4d8fb7f80c54b8db01d490852086, type: 3}
   castVolume: 1
+  healAmount: 2
+  healRange: 30
+  hexRange: 30
 --- !u!1001 &1572528114021983354
 PrefabInstance:
   m_ObjectHideFlags: 0
