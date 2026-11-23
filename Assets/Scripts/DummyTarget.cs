@@ -27,6 +27,9 @@ public class DummyTarget : MonoBehaviour
     private Coroutine hexCoroutine;
     private GameObject activeHexEffect;
 
+    [Header("Health UI")]
+    public DummyHealthUI healthUI;
+
     private Renderer[] renderers;
     private Collider[] colliders;
 
@@ -42,12 +45,14 @@ public class DummyTarget : MonoBehaviour
         colliders = GetComponentsInChildren<Collider>();
 
         currentHealth = maxHealth;
+
+        UpdateHealthUI();
     }
 
     // DAMAGE
     public void TakeDamage(int damage)
     {
-        if (isDead)
+        if (isDead || damage <= 0)
             return;
 
         int actualDamage = damage;
@@ -59,9 +64,11 @@ public class DummyTarget : MonoBehaviour
             );
         }
 
-        currentHealth -= actualDamage;
+        currentHealth = Mathf.Max(0, currentHealth - actualDamage);
 
         SpawnDamageNumber(actualDamage);
+
+        UpdateHealthUI();
 
         Debug.Log("Dummy health: " + currentHealth);
 
@@ -74,12 +81,15 @@ public class DummyTarget : MonoBehaviour
     // HEAL
     public void Heal(int amount)
     {
-        if (isDead)
+        if (isDead || amount <= 0)
             return;
 
-        currentHealth += amount;
+        currentHealth = Mathf.Min(
+        currentHealth + amount,
+        maxHealth
+        );
 
-        currentHealth = Mathf.Min(currentHealth, maxHealth);
+        UpdateHealthUI();
 
         Debug.Log("Dummy healed! Health: " + currentHealth);
     }
@@ -90,13 +100,13 @@ public class DummyTarget : MonoBehaviour
         if (isDead)
             return;
 
-        // Refresh the curse duration.
+        // Refresh existing curse.
         if (hexCoroutine != null)
         {
             StopCoroutine(hexCoroutine);
         }
 
-        // Create the visual effect if it doesn't exist.
+        // Create visual effect if needed.
         if (activeHexEffect == null && hexEffectPrefab != null)
         {
             activeHexEffect = Instantiate(
@@ -163,12 +173,21 @@ public class DummyTarget : MonoBehaviour
         }
     }
 
+    // HEALTH UI
+    private void UpdateHealthUI()
+    {
+        if (healthUI != null)
+        {
+            healthUI.UpdateHealth(currentHealth, maxHealth);
+        }
+    }
+
     // DEATH AND RESPAWN
     private IEnumerator DieAndRespawn()
     {
         isDead = true;
 
-        // Remove Hex when the dummy dies.
+        // Remove active Hex.
         if (hexCoroutine != null)
         {
             StopCoroutine(hexCoroutine);
@@ -183,6 +202,7 @@ public class DummyTarget : MonoBehaviour
             activeHexEffect = null;
         }
 
+        // Hide dummy.
         foreach (Renderer rend in renderers)
         {
             rend.enabled = false;
@@ -193,10 +213,17 @@ public class DummyTarget : MonoBehaviour
             col.enabled = false;
         }
 
+        // Hide health UI.
+        if (healthUI != null)
+        {
+            healthUI.gameObject.SetActive(false);
+        }
+
         Debug.Log("Dummy defeated!");
 
         yield return new WaitForSecondsRealtime(respawnDelay);
 
+        // Restore dummy.
         transform.position = startingPosition;
         transform.rotation = startingRotation;
 
@@ -211,6 +238,14 @@ public class DummyTarget : MonoBehaviour
         {
             col.enabled = true;
         }
+
+        // Restore health UI.
+        if (healthUI != null)
+        {
+            healthUI.gameObject.SetActive(true);
+        }
+
+        UpdateHealthUI();
 
         isDead = false;
 
@@ -228,5 +263,4 @@ public class DummyTarget : MonoBehaviour
         return isHexed;
     }
 }
-
 
