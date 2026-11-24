@@ -30,7 +30,7 @@ public class SpellBolt : MonoBehaviour
         if (hasHit)
             return;
 
-        if (target == null)
+        if (target == null) 
         {
             Destroy(gameObject);
             return;

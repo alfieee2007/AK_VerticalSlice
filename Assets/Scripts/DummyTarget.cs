@@ -56,6 +56,8 @@ public class DummyTarget : MonoBehaviour
             StopCoroutine(flashRoutine);
         }
 
+       
+
         flashRoutine = StartCoroutine(FlashRed());
     }
 

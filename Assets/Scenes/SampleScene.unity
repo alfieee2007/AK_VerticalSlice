@@ -586,7 +586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DummyTarget
   health: 100
-  damageColour: {r: 1, g: 0, b: 0, a: 0.6313726}
+  damageColour: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.15
 --- !u!1 &1555190572
 GameObject:
@@ -613,7 +613,7 @@ Transform:
   m_GameObject: {fileID: 1555190572}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.38, z: 1.37}
+  m_LocalPosition: {x: 0.454, y: 0.38, z: 0.663}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -857,7 +857,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'PREES E - MAGIC BOLT
+  m_text: 'PRESS E - MAGIC BOLT
 
 '
   m_isRightToLeft: 0
